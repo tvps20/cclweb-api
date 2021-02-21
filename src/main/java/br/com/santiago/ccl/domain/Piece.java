@@ -1,12 +1,9 @@
 package br.com.santiago.ccl.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +13,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Piece extends AbstractBaseEntity {
@@ -26,26 +23,27 @@ public class Piece extends AbstractBaseEntity {
 
 	@Getter
 	@Setter
-	private int qtd;
+	@Column(nullable = false)
+	private Integer qtd;
 
 	@Getter
 	@Setter
+	@Column(unique = true)
 	private String partNum;
 
 	@Getter
 	@Setter
+	@Column(nullable = false)
 	private String color;
 
 	@Getter
 	@Setter
+	@Column(nullable = false)
 	private String description;
 
 	@Getter
 	@Setter
-	@Builder.Default
-	@ElementCollection
-	@CollectionTable(name = "piece_pictures_urls")
-	private List<String> picturesUrls = new ArrayList<>();
+	private String pictureUrl;
 
 	@Getter
 	@Setter
@@ -53,6 +51,7 @@ public class Piece extends AbstractBaseEntity {
 
 	@Getter
 	@Setter
+	@ManyToOne
 	@JoinColumn(name = "set_id", nullable = false)
 	private Set set;
 

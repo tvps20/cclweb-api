@@ -1,9 +1,4 @@
-package br.com.santiago.ccl.domain;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+package br.com.santiago.ccl.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,33 +7,32 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Entity
 @Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Piece extends AbstractBaseEntity {
+public class PieceResponseDto extends AbstractResponseBaseDto {
 
 	private static final long serialVersionUID = 1L;
 
 	@Getter
 	@Setter
-	@Column(nullable = false)
+	private Long id;
+
+	@Getter
+	@Setter
 	private Integer qtd;
 
 	@Getter
 	@Setter
-	@Column(unique = true)
 	private String partNum;
 
 	@Getter
 	@Setter
-	@Column(nullable = false)
 	private String color;
 
 	@Getter
 	@Setter
-	@Column(nullable = false)
 	private String description;
 
 	@Getter
@@ -51,8 +45,6 @@ public class Piece extends AbstractBaseEntity {
 
 	@Getter
 	@Setter
-	@ManyToOne
-	@JoinColumn(name = "set_id", nullable = false)
-	private Set set;
+	private Long setId;
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -22,8 +23,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Set extends AbstractBaseEntity {
@@ -32,10 +33,12 @@ public class Set extends AbstractBaseEntity {
 
 	@Getter
 	@Setter
+	@Column(unique = true, nullable = false)
 	private String setId;
 
 	@Getter
 	@Setter
+	@Column(nullable = false)
 	private String name;
 
 	@Getter
@@ -56,7 +59,7 @@ public class Set extends AbstractBaseEntity {
 	@Setter
 	@Builder.Default
 	@OneToMany(cascade = { CascadeType.REMOVE }, mappedBy = "set")
-	@OnDelete(action = OnDeleteAction.CASCADE) // Gera o “cascade delete” Evita várias querys para delete
+	@OnDelete(action = OnDeleteAction.CASCADE) // Gera o “cascade delete” Evita várias querys para o delete
 	private List<Piece> pcs = new ArrayList<>();
 
 	@Getter

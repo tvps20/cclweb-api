@@ -15,7 +15,8 @@ import br.com.santiago.ccl.domain.Set;
 import br.com.santiago.ccl.domain.Theme;
 import br.com.santiago.ccl.dtos.SetPieceResponseDto;
 import br.com.santiago.ccl.dtos.SetRequestDto;
-import br.com.santiago.ccl.dtos.SetResponseDto;
+import br.com.santiago.ccl.dtos.SetDetailResponseDto;
+import br.com.santiago.ccl.dtos.SetListResponseDto;
 import br.com.santiago.ccl.dtos.ThemeResponseDto;
 import br.com.santiago.ccl.repositories.SetRepository;
 import br.com.santiago.ccl.services.exceptions.DataIntegrityException;
@@ -55,7 +56,7 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 		} catch (DataIntegrityViolationException ex) {
 			this.errorMsg = MessageFormat.format("Error saving {0} in the database", this.simpleClassName);
 			log.error(this.errorMsg);
-			log.trace("entity parameter [{}]", entity.toString());
+//			log.trace("entity parameter [{}]", entity.toString());
 			throw new DataIntegrityException(this.errorMsg);
 		}
 	}
@@ -149,8 +150,8 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 	}
 
 	@Override
-	public SetResponseDto parteToDto(Set entity) {
-		log.debug("Parse set to SetResponseDto");
+	public SetDetailResponseDto parteToDto(Set entity) {
+		log.debug("Parse set to SetDetailResponseDto");
 		List<ThemeResponseDto> themes = entity.getThemes().stream().map(dto -> this.themeService.parteToDto(dto))
 				.collect(Collectors.toList());
 		List<SetPieceResponseDto> pcs = entity.getPcs().stream().map(dto -> this.parseToSetPieceDto(dto))
@@ -158,9 +159,27 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 
 //		log.trace("entity parameter [{}]", entity.toString());
 
-		return SetResponseDto.builder().id(entity.getId()).setId(entity.getSetId()).name(entity.getName())
+		return SetDetailResponseDto.builder().id(entity.getId()).setId(entity.getSetId()).name(entity.getName())
 				.themes(themes).year(entity.getYear()).price(entity.getPrice()).pcs(pcs)
 				.figuresUrls(entity.getFiguresUrls()).instructionsUrls(entity.getInstructionsUrls()).build();
+	}
+
+	public SetListResponseDto parseToSetListDto(Set entity) {
+		log.debug("Parse set to SetListResponseDto");
+
+		String theme = this.makeCreateThemeName(entity.getThemes());
+
+		return SetListResponseDto.builder().id(entity.getId()).setId(entity.getSetId()).name(entity.getName())
+				.theme(theme).year(entity.getYear()).price(entity.getPrice()).pcs(entity.getPcs().size())
+				.intructions(!entity.getInstructionsUrls().isEmpty()).imgs(!entity.getFiguresUrls().isEmpty()).build();
+	}
+
+	private String makeCreateThemeName(List<Theme> themes) {
+		StringBuilder theme = new StringBuilder();
+
+		themes.stream().forEach(x -> theme.append(x.getName() + "/"));
+
+		return theme.substring(0, theme.length() - 1);
 	}
 
 	private SetPieceResponseDto parseToSetPieceDto(Piece piece) {

@@ -67,6 +67,7 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 		try {
 			Set entitySaved = this.findById(entity.getId());
 
+			// Verificando se o setId foi alterado
 			if (!entity.getSetId().equals(entitySaved.getSetId())) {
 				this.validUniqueValue(entity.getSetId(), "setId");
 			}
@@ -80,6 +81,16 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 //			log.trace("entity parameter [{}]", entity.toString());
 			throw new DataIntegrityException(this.errorMsg);
 		}
+	}
+
+	public Piece insetPiece(Long setId, Piece piece) {
+		Set setSalved = this.findById(setId);
+
+		piece.setSet(setSalved);
+		Piece pieceSalved = this.pieceService.insert(piece);
+		setSalved.getPcs().add(pieceSalved);
+
+		return pieceSalved;
 	}
 
 	private List<Theme> prepareThemesToInsert(Set set) {

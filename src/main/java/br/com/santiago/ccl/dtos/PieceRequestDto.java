@@ -52,9 +52,9 @@ public class PieceRequestDto extends AbstractBaseDto {
 	@Length(min = 5, max = 255, message = "The note field name be between 5 and 255 characters")
 	private String note;
 
-	@Getter
-	@Setter
-	@NotNull(message = "The setId field is not null")
-	private Long setId;
+//	@Getter
+//	@Setter
+//	@NotNull(message = "The setId field is not null")
+//	private Long setId;
 
 }

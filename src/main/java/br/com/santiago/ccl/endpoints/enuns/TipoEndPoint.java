@@ -12,6 +12,9 @@ public abstract class TipoEndPoint {
 	
 	public static final String PAGE = "/page";
 	public static final String ID = "/{id}";
+	
+	public static final String SET_ID = "/{setId}";
+	public static final String PIECE_ID = "/{pieceId}";
 
 	public static String makeRoute(String... endpoints) {
 		log.debug("Create new endpoint");

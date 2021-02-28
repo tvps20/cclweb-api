@@ -4,12 +4,10 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import br.com.santiago.ccl.domain.Piece;
-import br.com.santiago.ccl.domain.Set;
 import br.com.santiago.ccl.dtos.PieceRequestDto;
 import br.com.santiago.ccl.dtos.PieceResponseDto;
 import br.com.santiago.ccl.repositories.PieceRepository;
@@ -20,9 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class PieceService extends AbstractBaseService<Piece, PieceRequestDto> {
-
-	@Autowired
-	private SetService setService;
 
 	public PieceService(PieceRepository repository) {
 		super(repository);
@@ -62,11 +57,11 @@ public class PieceService extends AbstractBaseService<Piece, PieceRequestDto> {
 		log.debug("Parse pieceRequest to piece");
 		log.trace("request parameter [{}]", request.toString());
 
-		Set set = request.getSetId() != null ? this.setService.findById(request.getSetId()) : null;
+//		Set set = request.getSetId() != null ? this.setService.findById(request.getSetId()) : null;
 
 		return Piece.builder().qtd(request.getQtd()).partNum(request.getPartNum()).color(request.getColor())
 				.description(request.getDescription()).pictureUrl(request.getPictureUrl()).note(request.getNote())
-				.set(set).build();
+				.build();
 	}
 
 	@Override

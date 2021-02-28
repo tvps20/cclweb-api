@@ -1,11 +1,13 @@
 package br.com.santiago.ccl.endpoints;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.santiago.ccl.domain.Piece;
 import br.com.santiago.ccl.dtos.PieceRequestDto;
 import br.com.santiago.ccl.endpoints.enuns.TipoEndPoint;
+import br.com.santiago.ccl.endpoints.exceptions.EndpointNotExistsException;
 import br.com.santiago.ccl.services.PieceService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +21,16 @@ public class PieceController extends AbstractBaseController<Piece, PieceRequestD
 		log.debug("Endpoint available on the route {}", TipoEndPoint.PIECE);
 		this.simpleClassName = "Piece";
 		this.routerName = TipoEndPoint.PIECE;
+	}
+
+	@Override
+	public ResponseEntity<Void> insert(PieceRequestDto request) throws Exception {
+		throw new EndpointNotExistsException("Endpoint not implemented.");
+	}
+
+	@Override
+	public ResponseEntity<Void> delete(Long id) throws Exception {
+		throw new EndpointNotExistsException("Endpoint not implemented.");
 	}
 
 	@Override

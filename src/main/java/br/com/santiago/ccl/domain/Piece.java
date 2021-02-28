@@ -28,7 +28,7 @@ public class Piece extends AbstractBaseEntity {
 
 	@Getter
 	@Setter
-	@Column(unique = true)
+//	@Column(unique = true)
 	private String partNum;
 
 	@Getter

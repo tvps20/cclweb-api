@@ -86,6 +86,7 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 	}
 
 	public Piece insetPiece(Long setId, Piece piece) {
+		log.debug("Insert new Piece in Set in database");
 		Set setSalved = this.findById(setId);
 
 		piece.setSet(setSalved);
@@ -124,6 +125,10 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 		}
 	}
 
+	public void deletePiece(Long pieceId) {
+		this.pieceService.deleteById(pieceId);
+	}
+	
 	public void deleteTheme(Long setId, Long themeId) {
 		log.debug("Delete Theme in Set in database");
 

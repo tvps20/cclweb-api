@@ -54,8 +54,8 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 	public ResponseEntity<List<AbstractBaseDto>> listAll() {
 		log.debug("ListAll {}s in endpoint [{}]", this.simpleClassName, this.routerName);
 		List<Set> list = this.baseService.findAll();
-		List<AbstractBaseDto> listDto = list.stream()
-				.map(entity -> ((SetService) this.baseService).parseToSetListDto(entity)).collect(Collectors.toList());
+		List<AbstractBaseDto> listDto = list.stream().map(entity -> this.getSetService().parseToSetListDto(entity))
+				.collect(Collectors.toList());
 
 		return ResponseEntity.ok().body(listDto);
 	}
@@ -68,7 +68,7 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy) {
 		log.debug("ListAllPage {}s in endpoint [{}]", this.simpleClassName, this.routerName);
 		Page<Set> pages = this.baseService.findAllPage(page, linesPerPage, direction, orderBy);
-		Page<AbstractBaseDto> pageDto = pages.map(entity -> ((SetService) this.baseService).parseToSetListDto(entity));
+		Page<AbstractBaseDto> pageDto = pages.map(entity -> this.getSetService().parseToSetListDto(entity));
 
 		return ResponseEntity.ok().body(pageDto);
 	}
@@ -78,7 +78,7 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 		log.debug("Insert Piece in {} in endpoint [{}]", this.simpleClassName, this.routerName + TipoEndPoint.PIECE);
 
 		Piece piece = this.pieceService.parseToEntity(request);
-		((SetService) this.baseService).insetPiece(setId, piece);
+		this.getSetService().insetPiece(setId, piece);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().replacePath(TipoEndPoint.SET + "/{id}")
 				.buildAndExpand(setId).toUri();
 		log.trace("uri variable [{}]", uri);
@@ -92,7 +92,7 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 				this.routerName + TipoEndPoint.THEME);
 
 		Theme theme = this.themeService.parseToEntity(request);
-		((SetService) this.baseService).insertTheme(setId, theme);
+		this.getSetService().insertTheme(setId, theme);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().replacePath(TipoEndPoint.THEME + "/{id}")
 				.buildAndExpand(setId).toUri();
 		log.trace("uri variable [{}]", uri);
@@ -103,7 +103,7 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 	@DeleteMapping(TipoEndPoint.SET_ID + TipoEndPoint.PIECE + TipoEndPoint.PIECE_ID)
 	public ResponseEntity<Void> deletePiece(@PathVariable Long pieceId) {
 		log.debug("Delete Piece {} in endpoint [{}]", this.simpleClassName, this.routerName);
-		this.pieceService.deleteById(pieceId);
+		this.getSetService().deletePiece(pieceId);
 
 		return ResponseEntity.noContent().build();
 	}
@@ -111,7 +111,7 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 	@DeleteMapping(TipoEndPoint.SET_ID + TipoEndPoint.THEME + TipoEndPoint.THEME_ID)
 	public ResponseEntity<Void> deleteTheme(@PathVariable Long setId, @PathVariable Long themeId) {
 		log.debug("Delete Piece {} in endpoint [{}]", this.simpleClassName, this.routerName);
-		((SetService) this.baseService).deleteTheme(setId, themeId);
+		this.getSetService().deleteTheme(setId, themeId);
 
 		return ResponseEntity.noContent().build();
 	}
@@ -124,6 +124,10 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 	@Override
 	public SetRequestDto parseToDto(Set response) {
 		return (SetRequestDto) this.baseService.parteToDto(response);
+	}
+
+	private SetService getSetService() {
+		return ((SetService) this.baseService);
 	}
 
 }

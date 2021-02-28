@@ -21,6 +21,7 @@ import br.com.santiago.ccl.dtos.ThemeResponseDto;
 import br.com.santiago.ccl.repositories.SetRepository;
 import br.com.santiago.ccl.services.exceptions.DataIntegrityException;
 import br.com.santiago.ccl.services.exceptions.ObjectNotFoundException;
+import br.com.santiago.ccl.services.exceptions.ObjectUniqueException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -94,19 +95,88 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 		return pieceSalved;
 	}
 
+	@Transactional
+	public Theme insertTheme(Long setId, Theme theme) {
+		log.debug("Insert new Theme in Set in database");
+
+		try {
+			Set setSalved = this.findById(setId);
+
+			// Verificando se o tema ja foi adicionado ao set
+			setSalved.getThemes().forEach(x -> {
+				if (x.getName().equals(theme.getName())) {
+					throw new ObjectUniqueException("Theme already registered in this set");
+				}
+			});
+
+			setSalved.getThemes().add(theme);
+			List<Theme> themes = this.prepareThemesToInsert(setSalved);
+			setSalved.setThemes(themes);
+			this.themeService.savaAll(themes);
+			this.baseRepository.save(setSalved);
+
+			return theme;
+		} catch (DataIntegrityViolationException ex) {
+			this.errorMsg = MessageFormat.format("Error saving {0} in the database", "Theme in Set");
+			log.error(this.errorMsg);
+//			log.trace("entity parameter [{}]", entity.toString());
+			throw new DataIntegrityException(this.errorMsg);
+		}
+	}
+
+	public void deleteTheme(Long setId, Long themeId) {
+		log.debug("Delete Theme in Set in database");
+
+		try {
+			Set setSaved = this.findById(setId);
+			Theme themeSalved = this.themeService.findById(themeId);
+
+			// Verificando se o theme ainda existe no set
+			if (!setSaved.getThemes().contains(themeSalved)) {
+				throw new ObjectNotFoundException("Theme not registered in this set");
+			}
+
+			List<Theme> themes = this.prepareThemesToDelete(setSaved, themeId);
+			setSaved.setThemes(themes);
+			this.baseRepository.save(setSaved);
+
+		} catch (DataIntegrityViolationException ex) {
+			this.errorMsg = MessageFormat.format("Error delete {0} in the database", "Theme in Set");
+			log.error(this.errorMsg);
+//			log.trace("entity parameter [{}]", entity.toString());
+			throw new DataIntegrityException(this.errorMsg);
+		}
+	}
+
 	private List<Theme> prepareThemesToInsert(Set set) {
 		log.debug("prepare Themes To Insert in database");
 		List<Theme> themesForInsert = new ArrayList<>();
 
 		set.getThemes().forEach(x -> {
 			try {
-				themesForInsert.add(this.themeService.findByName(x.getName()));
+				Theme theme = this.themeService.findByName(x.getName());
+				if (!themesForInsert.contains(theme)) {
+					themesForInsert.add(theme);
+				}
 			} catch (ObjectNotFoundException ex) {
 				themesForInsert.add(x);
 			}
 		});
 
 		return themesForInsert;
+	}
+
+	private List<Theme> prepareThemesToDelete(Set set, Long themeId) {
+		log.debug("prepare Themes To Delete in database");
+		List<Theme> themesForDelete = new ArrayList<>();
+
+		set.getThemes().forEach(x -> {
+			if (x.getId() != themeId) {
+				themesForDelete.add(x);
+			}
+		});
+
+		return themesForDelete;
 	}
 
 	private List<Piece> preparePiecesToInsert(Set set) {

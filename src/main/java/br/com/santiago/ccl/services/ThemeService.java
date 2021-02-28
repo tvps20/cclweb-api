@@ -37,6 +37,7 @@ public class ThemeService extends AbstractBaseWithValidation<Theme, ThemeRequest
 		try {
 			Theme entitySaved = this.findById(entity.getId());
 			
+			// Verificando se o name foi alterado
 			if(!entity.getName().equals(entitySaved.getName())) {
 				this.validUniqueValue(entity.getName(), "name");				
 			}

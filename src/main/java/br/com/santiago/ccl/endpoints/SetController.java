@@ -20,12 +20,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.santiago.ccl.domain.Piece;
 import br.com.santiago.ccl.domain.Set;
+import br.com.santiago.ccl.domain.Theme;
 import br.com.santiago.ccl.dtos.AbstractBaseDto;
 import br.com.santiago.ccl.dtos.PieceRequestDto;
 import br.com.santiago.ccl.dtos.SetRequestDto;
+import br.com.santiago.ccl.dtos.ThemeRequestDto;
 import br.com.santiago.ccl.endpoints.enuns.TipoEndPoint;
 import br.com.santiago.ccl.services.PieceService;
 import br.com.santiago.ccl.services.SetService;
+import br.com.santiago.ccl.services.ThemeService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,6 +38,9 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 
 	@Autowired
 	private PieceService pieceService;
+
+	@Autowired
+	private ThemeService themeService;
 
 	@Autowired
 	public SetController(SetService service) {
@@ -80,10 +86,32 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 		return ResponseEntity.created(uri).build();
 	}
 
+	@PostMapping(TipoEndPoint.SET_ID + TipoEndPoint.THEME)
+	public ResponseEntity<Void> insertTheme(@PathVariable Long setId, @Valid @RequestBody ThemeRequestDto request) {
+		log.debug("Insert Piece in Theme {} in endpoint [{}]", this.simpleClassName,
+				this.routerName + TipoEndPoint.THEME);
+
+		Theme theme = this.themeService.parseToEntity(request);
+		((SetService) this.baseService).insertTheme(setId, theme);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().replacePath(TipoEndPoint.THEME + "/{id}")
+				.buildAndExpand(setId).toUri();
+		log.trace("uri variable [{}]", uri);
+
+		return ResponseEntity.created(uri).build();
+	}
+
 	@DeleteMapping(TipoEndPoint.SET_ID + TipoEndPoint.PIECE + TipoEndPoint.PIECE_ID)
 	public ResponseEntity<Void> deletePiece(@PathVariable Long pieceId) {
 		log.debug("Delete Piece {} in endpoint [{}]", this.simpleClassName, this.routerName);
 		this.pieceService.deleteById(pieceId);
+
+		return ResponseEntity.noContent().build();
+	}
+
+	@DeleteMapping(TipoEndPoint.SET_ID + TipoEndPoint.THEME + TipoEndPoint.THEME_ID)
+	public ResponseEntity<Void> deleteTheme(@PathVariable Long setId, @PathVariable Long themeId) {
+		log.debug("Delete Piece {} in endpoint [{}]", this.simpleClassName, this.routerName);
+		((SetService) this.baseService).deleteTheme(setId, themeId);
 
 		return ResponseEntity.noContent().build();
 	}

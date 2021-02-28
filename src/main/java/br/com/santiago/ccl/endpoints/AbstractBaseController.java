@@ -41,6 +41,7 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 		List<T> list = this.baseService.findAll();
 		List<AbstractBaseDto> listDto = list.stream().map(entity -> this.baseService.parteToDto(entity))
 				.collect(Collectors.toList());
+		
 		return ResponseEntity.ok().body(listDto);
 	}
 
@@ -53,6 +54,7 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 		log.debug("ListAllPage {}s in endpoint [{}]", this.simpleClassName, this.routerName);
 		Page<T> pages = this.baseService.findAllPage(page, linesPerPage, direction, orderBy);
 		Page<AbstractBaseDto> pageDto = pages.map(entity -> this.baseService.parteToDto(entity));
+		
 		return ResponseEntity.ok().body(pageDto);
 	}
 
@@ -61,17 +63,19 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 		log.debug("FindById {} in endpoint [{}]", this.simpleClassName, this.routerName);
 		T entity = this.baseService.findById(id);
 		AbstractBaseDto entityDto = this.baseService.parteToDto(entity);
+		
 		return ResponseEntity.ok().body(entityDto);
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> insert(@Valid @RequestBody K request) {
+	public ResponseEntity<Void> insert(@Valid @RequestBody K request) throws Exception {
 		log.debug("Insert {} in endpoint [{}]", this.simpleClassName, this.routerName);
 		T entity = this.parseToEntity(request);
 		T entitySaved = this.baseService.insert(entity);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(entitySaved.getId())
 				.toUri();
 		log.trace("uri variable [{}]", uri);
+		
 		return ResponseEntity.created(uri).build();
 	}
 
@@ -82,13 +86,15 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 		T entity = this.parseToEntity(request);
 		entity.setId(id);
 		this.baseService.update(entity);
+		
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping(TipoEndPoint.ID)
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
+	public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
 		log.debug("Delete {} in endpoint [{}]", this.simpleClassName, this.routerName);
 		this.baseService.deleteById(id);
+		
 		return ResponseEntity.noContent().build();
 	}
 

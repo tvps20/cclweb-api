@@ -1,8 +1,6 @@
 package br.com.santiago.ccl.dtos;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,8 +13,8 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class SetResponseDto extends AbstractResponseBaseDto {
-
+public class SetListResponseDto extends AbstractResponseBaseDto {
+	
 	private static final long serialVersionUID = 1L;
 
 	@Getter
@@ -33,8 +31,7 @@ public class SetResponseDto extends AbstractResponseBaseDto {
 
 	@Getter
 	@Setter
-	@Builder.Default
-	private List<ThemeResponseDto> themes = new ArrayList<>();
+	private String theme;
 
 	@Getter
 	@Setter
@@ -46,17 +43,14 @@ public class SetResponseDto extends AbstractResponseBaseDto {
 
 	@Getter
 	@Setter
-	@Builder.Default
-	private List<SetPieceResponseDto> pcs = new ArrayList<>();
+	private Integer pcs;
 
 	@Getter
 	@Setter
-	@Builder.Default
-	private List<String> figuresUrls = new ArrayList<>();
+	private boolean imgs;
 
 	@Getter
 	@Setter
-	@Builder.Default
-	private List<String> instructionsUrls = new ArrayList<>();
-
+	private boolean intructions;
+	
 }

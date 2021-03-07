@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.santiago.ccl.domain.Piece;
 import br.com.santiago.ccl.domain.Set;
 import br.com.santiago.ccl.domain.Theme;
-import br.com.santiago.ccl.dtos.SetPieceResponseDto;
-import br.com.santiago.ccl.dtos.SetRequestDto;
 import br.com.santiago.ccl.dtos.SetDetailResponseDto;
 import br.com.santiago.ccl.dtos.SetListResponseDto;
+import br.com.santiago.ccl.dtos.SetPieceResponseDto;
+import br.com.santiago.ccl.dtos.SetRequestDto;
 import br.com.santiago.ccl.dtos.ThemeResponseDto;
 import br.com.santiago.ccl.repositories.SetRepository;
 import br.com.santiago.ccl.services.exceptions.DataIntegrityException;
@@ -36,36 +36,35 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 
 	public SetService(SetRepository repository) {
 		super(repository);
-		this.simpleClassName = "Set";
+		this.simpleClassName = this.getClass().getSimpleName();
 	}
 
 	@Override
 	@Transactional
 	public Set insert(Set entity) {
-		log.debug("Insert new {} in database", this.simpleClassName);
 		this.validUniqueValue(entity.getSetId(), "setId");
 
 		try {
 			List<Theme> themes = this.prepareThemesToInsert(entity);
-			this.themeService.savaAll(themes);
+			this.themeService.saveAll(themes);
 			entity.setThemes(themes);
 			Set setSalved = this.baseRepository.save(entity);
 			List<Piece> pcs = this.preparePiecesToInsert(entity);
-			this.pieceService.savaAll(pcs);
+			this.pieceService.saveAll(pcs);
+			log.debug("[{}] [insert] [Success] - Data saved in the database with id: {}.", this.simpleClassName,
+					setSalved.getId());
 
 			return setSalved;
 		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error saving {0} in the database", this.simpleClassName);
+			this.errorMsg = MessageFormat.format("[{0}] [insert] [Error] - Failed to save data to the database.",
+					this.simpleClassName);
 			log.error(this.errorMsg);
-//			log.trace("entity parameter [{}]", entity.toString());
 			throw new DataIntegrityException(this.errorMsg);
 		}
 	}
 
 	@Override
 	public Set update(Set entity) {
-		log.debug("Update {} in database", this.simpleClassName);
-
 		try {
 			Set entitySaved = this.findById(entity.getId());
 
@@ -75,18 +74,21 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 			}
 
 			this.updateData(entitySaved, entity);
+			Set entityUpdate = this.baseRepository.save(entitySaved);
+			log.debug("[{}] [update] [Success] - Data updated in the database with id: {}.", this.simpleClassName,
+					entityUpdate.getId());
 
-			return this.baseRepository.save(entitySaved);
+			return entityUpdate;
 		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error updating {0} in the database", this.simpleClassName);
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [update] [Error] - Failed to update data to the database with id: {1}.", this.simpleClassName,
+					entity.getId());
 			log.error(this.errorMsg);
-//			log.trace("entity parameter [{}]", entity.toString());
 			throw new DataIntegrityException(this.errorMsg);
 		}
 	}
 
 	public Piece insetPiece(Long setId, Piece piece) {
-		log.debug("Insert new Piece in Set in database");
 		Set setSalved = this.findById(setId);
 
 		piece.setSet(setSalved);
@@ -98,29 +100,35 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 
 	@Transactional
 	public Theme insertTheme(Long setId, Theme theme) {
-		log.debug("Insert new Theme in Set in database");
-
 		try {
 			Set setSalved = this.findById(setId);
 
 			// Verificando se o tema ja foi adicionado ao set
 			setSalved.getThemes().forEach(x -> {
 				if (x.getName().equals(theme.getName())) {
-					throw new ObjectUniqueException("Theme already registered in this set");
+					this.errorMsg = MessageFormat.format(
+							"[{0}] [insertTheme] [Error] - Theme already registered in this set with id: {1}.",
+							this.simpleClassName, setId);
+					log.error(this.errorMsg);
+					throw new ObjectUniqueException(this.errorMsg);
 				}
 			});
 
 			setSalved.getThemes().add(theme);
 			List<Theme> themes = this.prepareThemesToInsert(setSalved);
 			setSalved.setThemes(themes);
-			this.themeService.savaAll(themes);
+			this.themeService.saveAll(themes);
 			this.baseRepository.save(setSalved);
 
+			log.debug("[{}] [insertTheme] [Success] - Theme salved with success in the set with id: {}.",
+					this.simpleClassName, setId);
 			return theme;
+
 		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error saving {0} in the database", "Theme in Set");
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [insertTheme] [Error] - Error when trying to save theme on set with id: {1}.",
+					this.simpleClassName, setId);
 			log.error(this.errorMsg);
-//			log.trace("entity parameter [{}]", entity.toString());
 			throw new DataIntegrityException(this.errorMsg);
 		}
 	}
@@ -128,33 +136,38 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 	public void deletePiece(Long pieceId) {
 		this.pieceService.deleteById(pieceId);
 	}
-	
-	public void deleteTheme(Long setId, Long themeId) {
-		log.debug("Delete Theme in Set in database");
 
+	public void deleteTheme(Long setId, Long themeId) {
 		try {
 			Set setSaved = this.findById(setId);
 			Theme themeSalved = this.themeService.findById(themeId);
 
 			// Verificando se o theme ainda existe no set
 			if (!setSaved.getThemes().contains(themeSalved)) {
-				throw new ObjectNotFoundException("Theme not registered in this set");
+				this.errorMsg = MessageFormat.format(
+						"[{0}] [deleteTheme] [Error] - Theme not registered in this set with id: {1}.",
+						this.simpleClassName, setId);
+				log.error(this.errorMsg);
+				throw new ObjectNotFoundException(this.errorMsg);
 			}
 
 			List<Theme> themes = this.prepareThemesToDelete(setSaved, themeId);
 			setSaved.setThemes(themes);
 			this.baseRepository.save(setSaved);
+			log.debug("[{}] [deleteTheme] [Success] - Theme deleted in the database with id: {}.", this.simpleClassName,
+					themeId);
 
 		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error delete {0} in the database", "Theme in Set");
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [deleteTheme] [Error] - Error when trying to delete the theme from the database with id: {1}.",
+					this.simpleClassName, themeId);
 			log.error(this.errorMsg);
-//			log.trace("entity parameter [{}]", entity.toString());
 			throw new DataIntegrityException(this.errorMsg);
 		}
 	}
 
 	private List<Theme> prepareThemesToInsert(Set set) {
-		log.debug("prepare Themes To Insert in database");
+		log.debug("[{}] [prepareThemesToInsert] [Info] - Prepare Themes To Insert in database.", this.simpleClassName);
 		List<Theme> themesForInsert = new ArrayList<>();
 
 		set.getThemes().forEach(x -> {
@@ -172,7 +185,7 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 	}
 
 	private List<Theme> prepareThemesToDelete(Set set, Long themeId) {
-		log.debug("prepare Themes To Delete in database");
+		log.debug("[{}] [prepareThemesToDelete] [Info] - Prepare Themes To Delete in database.", this.simpleClassName);
 		List<Theme> themesForDelete = new ArrayList<>();
 
 		set.getThemes().forEach(x -> {
@@ -185,7 +198,7 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 	}
 
 	private List<Piece> preparePiecesToInsert(Set set) {
-		log.debug("prepare Pieces To Insert in database");
+		log.debug("[{}] [preparePiecesToInsert] [Info] - Prepare Pieces To Insert in database.", this.simpleClassName);
 		List<Piece> piecesForInsert = new ArrayList<>();
 
 		set.getPcs().forEach(x -> {
@@ -198,9 +211,7 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 
 	@Override
 	public Set parseToEntity(SetRequestDto request) {
-		log.debug("Parse setRequest to set");
-//		log.trace("request parameter [{}]", request.toString());
-
+		log.trace("[{}] [parseToEntity] [Info] - Parse from SetRequestDto to Set.", this.simpleClassName);
 		List<Theme> themes = request.getThemes().stream().map(entity -> this.themeService.parseToEntity(entity))
 				.collect(Collectors.toList());
 		List<Piece> pcs = request.getPcs().stream().map(entity -> this.pieceService.parseToEntity(entity))
@@ -213,6 +224,7 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 
 	@Override
 	public void updateData(Set entitySaved, Set newEntity) {
+		log.trace("[{}] [updateData] [Info] - Updating data that can be modified.", this.simpleClassName);
 		entitySaved.setSetId(newEntity.getSetId());
 		entitySaved.setName(newEntity.getName());
 		entitySaved.setYear(newEntity.getYear());
@@ -226,13 +238,11 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 
 	@Override
 	public SetDetailResponseDto parteToDto(Set entity) {
-		log.debug("Parse set to SetDetailResponseDto");
+		log.trace("[{}] [parseToEntity] [Info] - Parse from Set to SetDetailResponseDto.", this.simpleClassName);
 		List<ThemeResponseDto> themes = entity.getThemes().stream().map(dto -> this.themeService.parteToDto(dto))
 				.collect(Collectors.toList());
 		List<SetPieceResponseDto> pcs = entity.getPcs().stream().map(dto -> this.parseToSetPieceDto(dto))
 				.collect(Collectors.toList());
-
-//		log.trace("entity parameter [{}]", entity.toString());
 
 		return SetDetailResponseDto.builder().id(entity.getId()).setId(entity.getSetId()).name(entity.getName())
 				.themes(themes).year(entity.getYear()).price(entity.getPrice()).pcs(pcs)
@@ -240,25 +250,27 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 	}
 
 	public SetListResponseDto parseToSetListDto(Set entity) {
-		log.debug("Parse set to SetListResponseDto");
+		log.trace("[{}] [parseToEntity] [Info] - Parse from Set to SetListResponseDto.", this.simpleClassName);
 
-		String theme = this.makeCreateThemeName(entity.getThemes());
+		String theme = this.mountThemeName(entity.getThemes());
 
 		return SetListResponseDto.builder().id(entity.getId()).setId(entity.getSetId()).name(entity.getName())
 				.theme(theme).year(entity.getYear()).price(entity.getPrice()).pcs(entity.getPcs().size())
 				.intructions(!entity.getInstructionsUrls().isEmpty()).imgs(!entity.getFiguresUrls().isEmpty()).build();
 	}
 
-	private String makeCreateThemeName(List<Theme> themes) {
+	private String mountThemeName(List<Theme> themes) {
 		StringBuilder theme = new StringBuilder();
 
 		themes.stream().forEach(x -> theme.append(x.getName() + "/"));
+		String newTheme = theme.substring(0, theme.length() - 1);
+		log.debug("[{}] [makeCreateThemeName] [Info] - Mount new theme name: {}.", this.simpleClassName, newTheme);
 
-		return theme.substring(0, theme.length() - 1);
+		return newTheme;
 	}
 
 	private SetPieceResponseDto parseToSetPieceDto(Piece piece) {
-		log.debug("Parse piece to SetPieceResponseDto");
+		log.trace("[{}] [parseToEntity] [Info] - Parse from Piece to SetPieceResponseDto.", this.simpleClassName);
 
 		return SetPieceResponseDto.builder().id(piece.getId()).qtd(piece.getQtd()).partNum(piece.getPartNum())
 				.color(piece.getColor()).description(piece.getDescription()).pictureUrl(piece.getPictureUrl())

@@ -12,7 +12,9 @@ import br.com.santiago.ccl.domain.Theme;
 import br.com.santiago.ccl.repositories.PieceRepository;
 import br.com.santiago.ccl.repositories.SetRepository;
 import br.com.santiago.ccl.repositories.ThemeRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class DbService {
 
@@ -26,6 +28,7 @@ public class DbService {
 	private PieceRepository peiceRepository;
 
 	public void initDataBase() {
+		log.debug("[{}] [initDataBase] [Info] - Started database with moke data.", this.getClass().getSimpleName());
 		Theme theme1 = Theme.builder().name("LEGO").build();
 		Theme theme2 = Theme.builder().name("BASIC").build();
 		Theme theme3 = Theme.builder().name("Accessories").build();
@@ -46,6 +49,8 @@ public class DbService {
 		this.themeRepository.saveAll(Arrays.asList(theme1, theme2, theme3, theme4));
 		this.setRepository.saveAll(Arrays.asList(set1, set2));
 		this.peiceRepository.saveAll(Arrays.asList(piece1, piece2, piece3));
+		log.debug("[{}] [initDataBase] [Info] - Finished insert in the database with moke data.",
+				this.getClass().getSimpleName());
 	}
 
 }

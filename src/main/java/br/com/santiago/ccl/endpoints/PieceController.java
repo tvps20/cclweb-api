@@ -18,9 +18,9 @@ public class PieceController extends AbstractBaseController<Piece, PieceRequestD
 
 	public PieceController(PieceService service) {
 		super(service);
-		log.debug("Endpoint available on the route {}", TipoEndPoint.PIECE);
-		this.simpleClassName = "Piece";
-		this.routerName = TipoEndPoint.PIECE;
+		log.debug("[{}] [PieceController] [Info] - Endpoint made available for requests in: {}.", this.simpleClassName,
+				TipoEndPoint.PIECE);
+		this.simpleClassName = this.getClass().getSimpleName();
 	}
 
 	@Override

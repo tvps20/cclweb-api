@@ -27,21 +27,20 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractBaseController<T extends AbstractBaseEntity, K extends AbstractBaseDto> {
 
 	protected ICrudService<T, K> baseService;
-	protected String simpleClassName = "Base";
-	protected String routerName;
+	protected String simpleClassName = this.getClass().getSimpleName();
 
 	public AbstractBaseController(ICrudService<T, K> service) {
 		this.baseService = service;
-		this.routerName = "routerName is not define";
 	}
 
 	@GetMapping
 	public ResponseEntity<List<AbstractBaseDto>> listAll() {
-		log.debug("ListAll {}s in endpoint [{}]", this.simpleClassName, this.routerName);
+		log.debug("[{}] [listAll] [Info] - Started request for list all data.", this.simpleClassName);
 		List<T> list = this.baseService.findAll();
 		List<AbstractBaseDto> listDto = list.stream().map(entity -> this.baseService.parteToDto(entity))
 				.collect(Collectors.toList());
-		
+		log.debug("[{}] [listAll] [Info] - Finished request for list all data.", this.simpleClassName);
+
 		return ResponseEntity.ok().body(listDto);
 	}
 
@@ -51,50 +50,54 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 			@RequestParam(value = "linesPerPage", defaultValue = "24") Integer linesPerPage,
 			@RequestParam(value = "direction", defaultValue = "ASC") String direction,
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy) {
-		log.debug("ListAllPage {}s in endpoint [{}]", this.simpleClassName, this.routerName);
+		log.debug("[{}] [listAllPage] [Info] - Started request for list all data.", this.simpleClassName);
 		Page<T> pages = this.baseService.findAllPage(page, linesPerPage, direction, orderBy);
 		Page<AbstractBaseDto> pageDto = pages.map(entity -> this.baseService.parteToDto(entity));
-		
+		log.debug("[{}] [listAllPage] [Info] - Finished request for list all data.", this.simpleClassName);
+
 		return ResponseEntity.ok().body(pageDto);
 	}
 
 	@GetMapping(TipoEndPoint.ID)
 	public ResponseEntity<AbstractBaseDto> findById(@PathVariable Long id) {
-		log.debug("FindById {} in endpoint [{}]", this.simpleClassName, this.routerName);
+		log.debug("[{}] [findById] [Info] - Started request for find data by id.", this.simpleClassName);
 		T entity = this.baseService.findById(id);
 		AbstractBaseDto entityDto = this.baseService.parteToDto(entity);
-		
+		log.debug("[{}] [findById] [Info] - Finished request for find data by id.", this.simpleClassName);
+
 		return ResponseEntity.ok().body(entityDto);
 	}
 
 	@PostMapping
 	public ResponseEntity<Void> insert(@Valid @RequestBody K request) throws Exception {
-		log.debug("Insert {} in endpoint [{}]", this.simpleClassName, this.routerName);
+		log.debug("[{}] [insert] [Info] - Started request for insert new data.", this.simpleClassName);
 		T entity = this.parseToEntity(request);
 		T entitySaved = this.baseService.insert(entity);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(entitySaved.getId())
 				.toUri();
-		log.trace("uri variable [{}]", uri);
-		
+		log.debug("[{}] [insert] [Success] - Created uri for new data: {}.", this.simpleClassName, uri);
+		log.debug("[{}] [insert] [Info] - Finished request for insert new data.", this.simpleClassName);
+
 		return ResponseEntity.created(uri).build();
 	}
 
 	@PutMapping(TipoEndPoint.ID)
 	public ResponseEntity<Void> update(@Valid @RequestBody K request, @PathVariable Long id) {
-		log.debug("Update {} in endpoint [{}]", this.simpleClassName, this.routerName);
-		log.trace("id parameter [{}]", id);
+		log.debug("[{}] [update] [Info] - Started request for update data.", this.simpleClassName);
 		T entity = this.parseToEntity(request);
 		entity.setId(id);
 		this.baseService.update(entity);
-		
+		log.debug("[{}] [update] [Info] - Finished request for update data.", this.simpleClassName);
+
 		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping(TipoEndPoint.ID)
 	public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
-		log.debug("Delete {} in endpoint [{}]", this.simpleClassName, this.routerName);
+		log.debug("[{}] [delete] [Info] - Started request for delete data.", this.simpleClassName);
 		this.baseService.deleteById(id);
-		
+		log.debug("[{}] [delete] [Info] - Finished request for delete data.", this.simpleClassName);
+
 		return ResponseEntity.noContent().build();
 	}
 

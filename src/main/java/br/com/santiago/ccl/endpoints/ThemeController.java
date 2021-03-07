@@ -18,9 +18,9 @@ public class ThemeController extends AbstractBaseController<Theme, ThemeRequestD
 	@Autowired
 	public ThemeController(ThemeService service) {
 		super(service);
-		log.debug("Endpoint available on the route {}", TipoEndPoint.THEME);
-		this.simpleClassName = "Theme";
-		this.routerName = TipoEndPoint.THEME;
+		log.debug("[{}] [PieceController] [Info] - Endpoint made available for requests in: {}.", this.simpleClassName,
+				TipoEndPoint.THEME);
+		this.simpleClassName = this.getClass().getSimpleName();
 	}
 
 	@Override

@@ -22,7 +22,7 @@ public abstract class AbstractBaseService<T extends AbstractBaseEntity, K extend
 		implements ICrudService<T, K> {
 
 	protected JpaRepository<T, Long> baseRepository;
-	protected String simpleClassName = "Base";
+	protected String simpleClassName = this.getClass().getSimpleName();
 	protected String errorMsg;
 
 	public AbstractBaseService(JpaRepository<T, Long> repository) {
@@ -31,75 +31,95 @@ public abstract class AbstractBaseService<T extends AbstractBaseEntity, K extend
 	}
 
 	public List<T> findAll() {
-		log.debug("FindAll {}s in database", this.simpleClassName);
+		log.debug("[{}] [findAll] [Success] - Finding the data in the database.", this.simpleClassName);
 		return this.baseRepository.findAll();
 	}
 
 	public Page<T> findAllPage(Integer page, Integer linesPerPage, String direction, String orderBy) {
-		log.debug("FindAllPage {}s in database", this.simpleClassName);
-		log.trace("page parameter [{}]", page);
-		log.trace("linesPerPage parameter [{}]", linesPerPage);
-		log.trace("orderBy parameter [{}]", orderBy);
-		log.trace("direction parameter [{}]", direction);
+		log.debug("[{}] [findAllPage] [Success] - Finding the data in the database.", this.simpleClassName);
+		log.trace("binding parameter [page] as [{}]", page);
+		log.trace("binding parameter [linesPerPage] as [{}]", linesPerPage);
+		log.trace("binding parameter [orderBy] as [{}]", orderBy);
+		log.trace("binding parameter [direction] as [{}]", direction);
 		Direction directionParse = direction.toUpperCase().equals("ASC") ? Direction.ASC : Direction.DESC;
 		PageRequest pageRequest = PageRequest.of(page, linesPerPage, directionParse, orderBy);
+
 		return this.baseRepository.findAll(pageRequest);
 	}
 
 	public T findById(Long id) {
-		log.debug("FindById {} in database", this.simpleClassName);
-		log.trace("id parameter [{}]", id);
 		Optional<T> entityOpt = this.baseRepository.findById(id);
 
 		if (!entityOpt.isPresent()) {
-			this.errorMsg = MessageFormat.format("{0} is not found for id [{1}]", this.simpleClassName, id);
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [findById] [Error] - Failed to fetch data from database with id: {1}.", this.simpleClassName,
+					id);
 			log.error(this.errorMsg);
 			throw new ObjectNotFoundException(this.errorMsg);
 		}
 
+		log.debug("[{}] [findById] [Success] - Finding the data in the database with id: {}.", this.simpleClassName, id);
 		return entityOpt.get();
 	}
 
 	public T insert(T entity) {
-		log.debug("Insert new {} in database", this.simpleClassName);
-//		log.trace("entity parameter [{}]", entity.toString());
-
 		try {
-			return this.baseRepository.save(entity);
+			T entitySalved = this.baseRepository.save(entity);
+			log.debug("[{}] [insert] [Success] - Data saved in the database with id: {}.", this.simpleClassName,
+					entitySalved.getId());
+
+			return entitySalved;
 		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error saving {0} in the database", this.simpleClassName);
+			this.errorMsg = MessageFormat.format("[{0}] [insert] [Error] - Failed to save data to the database.",
+					this.simpleClassName);
 			log.error(this.errorMsg);
-//			log.trace("entity parameter [{}]", entity.toString());
+			throw new DataIntegrityException(this.errorMsg);
+		}
+	}
+
+	public List<T> saveAll(List<T> list) {
+		try {
+			List<T> listSalved = this.baseRepository.saveAll(list);
+			log.debug("[{}] [savaAll] [Success] - List saved in the database.", this.simpleClassName);
+
+			return listSalved;
+		} catch (DataIntegrityViolationException ex) {
+			this.errorMsg = MessageFormat.format("[{0}] [savaAll] [Error] - Failed to save list to the database.",
+					this.simpleClassName);
+			log.error(this.errorMsg);
 			throw new DataIntegrityException(this.errorMsg);
 		}
 	}
 
 	public T update(T entity) {
-		log.debug("Update {} in database", this.simpleClassName);
-//		log.trace("entity parameter [{}]", entity.toString());
 
 		try {
 			T entitySaved = this.findById(entity.getId());
 			this.updateData(entitySaved, entity);
+			T entityUpdate = this.baseRepository.save(entitySaved);
+			log.debug("[{}] [update] [Success] - Data updated in the database with id: {}.", this.simpleClassName,
+					entityUpdate.getId());
 
-			return this.baseRepository.save(entitySaved);
+			return entityUpdate;
 		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error updating {0} in the database", this.simpleClassName);
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [update] [Error] - Failed to update data to the database with id: {1}.", this.simpleClassName,
+					entity.getId());
 			log.error(this.errorMsg);
-//			log.trace("entity parameter [{}]", entity.toString());
 			throw new DataIntegrityException(this.errorMsg);
 		}
 	}
 
 	public void deleteById(Long id) {
-		log.debug("Delete {} in database", this.simpleClassName);
-		log.trace("id parameter [{}]", id);
 		try {
 			this.findById(id);
 			this.baseRepository.deleteById(id);
-		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error deleting {0} in the database with id {1}", this.simpleClassName,
+			log.debug("[{}] [deleteById] [Success] - Data deleted in the database with id: {}.", this.simpleClassName,
 					id);
+		} catch (DataIntegrityViolationException ex) {
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [deleteById] [Error] - Failed to update data to the database with id: {1}.",
+					this.simpleClassName, id);
 			log.error(this.errorMsg);
 			throw new DataIntegrityException(this.errorMsg);
 		}

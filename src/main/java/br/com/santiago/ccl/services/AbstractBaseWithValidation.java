@@ -18,15 +18,18 @@ public abstract class AbstractBaseWithValidation<T extends AbstractBaseEntity, K
 	}
 
 	public Boolean validUniqueValue(String value, String fieldUniqueName) {
-		log.debug("ValidUniqueValue {} of the {} in database", fieldUniqueName, this.simpleClassName);
-		log.trace("value parameter [{}]", value);
-
 		if (this.alreadyExistsValue(value)) {
-			this.errorMsg = MessageFormat.format("There is already a {0} registered for this {1} [{2}]",
-					this.simpleClassName, fieldUniqueName, value);
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [validUniqueValue] [Error] - Data already registered in the database for the value: {1}.",
+					this.simpleClassName, value);
 			log.error(this.errorMsg);
 			throw new ObjectUniqueException(this.errorMsg);
 		}
+
+		log.debug("[{}] [validUniqueValue] [Success] - Data not registered in the database for the value: {}.",
+				this.simpleClassName, value);
+		log.trace("binding parameter [value] as [{}]", value);
+		log.trace("binding parameter [fieldUniqueName] as [{}]", fieldUniqueName);
 
 		return false;
 	}

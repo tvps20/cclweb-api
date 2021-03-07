@@ -1,17 +1,14 @@
 package br.com.santiago.ccl.services;
 
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import br.com.santiago.ccl.domain.Piece;
 import br.com.santiago.ccl.dtos.PieceRequestDto;
 import br.com.santiago.ccl.dtos.PieceResponseDto;
 import br.com.santiago.ccl.repositories.PieceRepository;
-import br.com.santiago.ccl.services.exceptions.DataIntegrityException;
 import br.com.santiago.ccl.services.exceptions.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,43 +18,28 @@ public class PieceService extends AbstractBaseService<Piece, PieceRequestDto> {
 
 	public PieceService(PieceRepository repository) {
 		super(repository);
-		this.simpleClassName = "Piece";
+		this.simpleClassName = this.getClass().getSimpleName();
 	}
 
 	public Piece findByPartNum(String partNum) {
-		log.debug("FindByPartNum {} in database", this.simpleClassName);
-		log.trace("name parameter [{}]", partNum);
 		Optional<Piece> pieceOpt = ((PieceRepository) this.baseRepository).findByPartNum(partNum);
 
 		if (!pieceOpt.isPresent()) {
-			this.errorMsg = MessageFormat.format("{0} is not found for partNum [{1}]", this.simpleClassName, partNum);
+			this.errorMsg = MessageFormat.format(
+					"[{0}] [findByPartNum] [Error] - Failed to fetch data from database with partNum: {1}.",
+					this.simpleClassName, partNum);
 			log.error(this.errorMsg);
 			throw new ObjectNotFoundException(this.errorMsg);
 		}
 
+		log.debug("[{}] [findByPartNum] [Success] - Finding the data in the database with partNum: {}.",
+				this.simpleClassName, partNum);
 		return pieceOpt.get();
-	}
-
-	public List<Piece> savaAll(List<Piece> pieces) {
-		log.debug("Save All {}s in database", this.simpleClassName);
-//		log.trace("list parameter [{}]", pieces.toString());
-
-		try {
-			return this.baseRepository.saveAll(pieces);
-		} catch (DataIntegrityViolationException ex) {
-			this.errorMsg = MessageFormat.format("Error saving all {0}s in the database", this.simpleClassName);
-			log.error(this.errorMsg);
-			log.trace("entity parameter", pieces.toString());
-			throw new DataIntegrityException(this.errorMsg);
-		}
 	}
 
 	@Override
 	public Piece parseToEntity(PieceRequestDto request) {
-		log.debug("Parse pieceRequest to piece");
-		log.trace("request parameter [{}]", request.toString());
-
-//		Set set = request.getSetId() != null ? this.setService.findById(request.getSetId()) : null;
+		log.trace("[{}] [parseToEntity] [Info] - Parse from PieceRequestDto to Piece.", this.simpleClassName);
 
 		return Piece.builder().qtd(request.getQtd()).partNum(request.getPartNum()).color(request.getColor())
 				.description(request.getDescription()).pictureUrl(request.getPictureUrl()).note(request.getNote())
@@ -66,6 +48,7 @@ public class PieceService extends AbstractBaseService<Piece, PieceRequestDto> {
 
 	@Override
 	public void updateData(Piece entitySaved, Piece newEntity) {
+		log.trace("[{}] [updateData] [Info] - Updating data that can be modified.", this.simpleClassName);
 		entitySaved.setQtd(newEntity.getQtd());
 		entitySaved.setPartNum(newEntity.getPartNum());
 		entitySaved.setColor(newEntity.getColor());
@@ -74,14 +57,11 @@ public class PieceService extends AbstractBaseService<Piece, PieceRequestDto> {
 
 	@Override
 	public PieceResponseDto parteToDto(Piece entity) {
-		log.debug("Parse piece to pieceResponseDto");
-		PieceResponseDto response = PieceResponseDto.builder().id(entity.getId()).qtd(entity.getQtd())
-				.partNum(entity.getPartNum()).color(entity.getColor()).description(entity.getDescription())
-				.pictureUrl(entity.getPictureUrl()).note(entity.getNote()).setId(entity.getSet().getId()).build();
+		log.trace("[{}] [parseToEntity] [Info] - Parse from Piece to PieceResponseDto.", this.simpleClassName);
 
-//		log.trace("entity parameter [{}]", entity.toString());
-
-		return response;
+		return PieceResponseDto.builder().id(entity.getId()).qtd(entity.getQtd()).partNum(entity.getPartNum())
+				.color(entity.getColor()).description(entity.getDescription()).pictureUrl(entity.getPictureUrl())
+				.note(entity.getNote()).setId(entity.getSet().getId()).build();
 	}
 
 }

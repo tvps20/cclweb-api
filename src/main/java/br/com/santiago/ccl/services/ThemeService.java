@@ -88,7 +88,7 @@ public class ThemeService extends AbstractBaseWithValidation<Theme, ThemeRequest
 	}
 
 	@Override
-	public ThemeResponseDto parteToDto(Theme entity) {
+	public ThemeResponseDto parseToDto(Theme entity) {
 		log.trace("[{}] [parseToEntity] [Info] - Parse from Theme to ThemeResponseDto.", this.simpleClassName);
 		return ThemeResponseDto.builder().id(entity.getId()).name(entity.getName()).build();
 	}

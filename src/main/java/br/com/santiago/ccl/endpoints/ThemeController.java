@@ -30,7 +30,7 @@ public class ThemeController extends AbstractBaseController<Theme, ThemeRequestD
 
 	@Override
 	public ThemeRequestDto parseToDto(Theme response) {
-		return (ThemeRequestDto) this.baseService.parteToDto(response);
+		return (ThemeRequestDto) this.baseService.parseToDto(response);
 	}
 
 }

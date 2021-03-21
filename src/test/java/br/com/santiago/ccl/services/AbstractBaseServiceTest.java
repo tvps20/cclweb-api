@@ -2,6 +2,7 @@ package br.com.santiago.ccl.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -36,6 +37,7 @@ public abstract class AbstractBaseServiceTest<T extends AbstractBaseEntity, K ex
 	protected List<T> baseList;
 	protected Optional<T> baseEntityOpt;
 	protected T baseEntity;
+	protected K baseDto;
 
 	@BeforeEach
 	public void init() {
@@ -44,6 +46,7 @@ public abstract class AbstractBaseServiceTest<T extends AbstractBaseEntity, K ex
 		this.baseList = this.mockCollectionEntityListBuilder();
 		this.baseEntityOpt = this.mockEntityOptBuilder();
 		this.baseEntity = this.mockEntityBuilder();
+		this.baseDto = this.mockDtoBuilder();
 	}
 
 	@Test
@@ -106,6 +109,24 @@ public abstract class AbstractBaseServiceTest<T extends AbstractBaseEntity, K ex
 
 		assertThrows(DataIntegrityException.class, () -> this.baseService.insert(this.baseEntity));
 		verify(this.baseRepository, Mockito.times(1)).save(this.baseEntity);
+	}
+
+	@Test
+	public void mustReturnSuccess_WhenSaveAllEntities() {
+		when(this.baseRepository.saveAll(this.baseList)).thenReturn(this.baseList);
+
+		List<T> result = this.baseService.saveAll(this.baseList);
+
+		assertEquals(this.baseList, result);
+		assertEquals(this.baseList.size(), 10);
+	}
+
+	@Test
+	public void mustReturnException_WhenSaveAllEntities() {
+		doThrow(DataIntegrityViolationException.class).when(this.baseRepository).saveAll(this.baseList);
+
+		assertThrows(DataIntegrityException.class, () -> this.baseService.saveAll(this.baseList));
+		verify(this.baseRepository, Mockito.times(1)).saveAll(this.baseList);
 	}
 
 	@Test
@@ -175,6 +196,24 @@ public abstract class AbstractBaseServiceTest<T extends AbstractBaseEntity, K ex
 		assertThrows(ObjectNotFoundException.class, () -> this.baseService.deleteById(id));
 	}
 
+	@Test
+	public void mustReturnSuccess_WhenParseToEntity() {
+		K request = this.baseDto;
+
+		T result = this.baseService.parseToEntity(request);
+
+		assertNotNull(result);
+	}
+
+	@Test
+	public void mustReturnSuccess_WhenParseToDto() {
+		AbstractBaseDto result = this.baseService.parseToDto(this.baseEntity);
+
+		assertNotNull(result);
+	}
+
+	public abstract K mockDtoBuilder();
+
 	public abstract T mockEntityBuilder();
 
 	public abstract Optional<T> mockEntityOptBuilder();
@@ -186,5 +225,5 @@ public abstract class AbstractBaseServiceTest<T extends AbstractBaseEntity, K ex
 	public abstract JpaRepository<T, Long> getRepository();
 
 	public abstract T getEntityUpdate();
-	
+
 }

@@ -56,7 +56,7 @@ public class PieceService extends AbstractBaseService<Piece, PieceRequestDto> {
 	}
 
 	@Override
-	public PieceResponseDto parteToDto(Piece entity) {
+	public PieceResponseDto parseToDto(Piece entity) {
 		log.trace("[{}] [parseToEntity] [Info] - Parse from Piece to PieceResponseDto.", this.simpleClassName);
 
 		return PieceResponseDto.builder().id(entity.getId()).qtd(entity.getQtd()).partNum(entity.getPartNum())

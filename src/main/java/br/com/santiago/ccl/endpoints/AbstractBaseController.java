@@ -37,7 +37,7 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 	public ResponseEntity<List<AbstractBaseDto>> listAll() {
 		log.debug("[{}] [listAll] [Info] - Started request for list all data.", this.simpleClassName);
 		List<T> list = this.baseService.findAll();
-		List<AbstractBaseDto> listDto = list.stream().map(entity -> this.baseService.parteToDto(entity))
+		List<AbstractBaseDto> listDto = list.stream().map(entity -> this.baseService.parseToDto(entity))
 				.collect(Collectors.toList());
 		log.debug("[{}] [listAll] [Info] - Finished request for list all data.", this.simpleClassName);
 
@@ -52,7 +52,7 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 			@RequestParam(value = "orderBy", defaultValue = "id") String orderBy) {
 		log.debug("[{}] [listAllPage] [Info] - Started request for list all data.", this.simpleClassName);
 		Page<T> pages = this.baseService.findAllPage(page, linesPerPage, direction, orderBy);
-		Page<AbstractBaseDto> pageDto = pages.map(entity -> this.baseService.parteToDto(entity));
+		Page<AbstractBaseDto> pageDto = pages.map(entity -> this.baseService.parseToDto(entity));
 		log.debug("[{}] [listAllPage] [Info] - Finished request for list all data.", this.simpleClassName);
 
 		return ResponseEntity.ok().body(pageDto);
@@ -62,7 +62,7 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 	public ResponseEntity<AbstractBaseDto> findById(@PathVariable Long id) {
 		log.debug("[{}] [findById] [Info] - Started request for find data by id.", this.simpleClassName);
 		T entity = this.baseService.findById(id);
-		AbstractBaseDto entityDto = this.baseService.parteToDto(entity);
+		AbstractBaseDto entityDto = this.baseService.parseToDto(entity);
 		log.debug("[{}] [findById] [Info] - Finished request for find data by id.", this.simpleClassName);
 
 		return ResponseEntity.ok().body(entityDto);

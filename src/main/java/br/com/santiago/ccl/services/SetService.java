@@ -237,9 +237,9 @@ public class SetService extends AbstractBaseWithValidation<Set, SetRequestDto> {
 	}
 
 	@Override
-	public SetDetailResponseDto parteToDto(Set entity) {
+	public SetDetailResponseDto parseToDto(Set entity) {
 		log.trace("[{}] [parseToEntity] [Info] - Parse from Set to SetDetailResponseDto.", this.simpleClassName);
-		List<ThemeResponseDto> themes = entity.getThemes().stream().map(dto -> this.themeService.parteToDto(dto))
+		List<ThemeResponseDto> themes = entity.getThemes().stream().map(dto -> this.themeService.parseToDto(dto))
 				.collect(Collectors.toList());
 		List<SetPieceResponseDto> pcs = entity.getPcs().stream().map(dto -> this.parseToSetPieceDto(dto))
 				.collect(Collectors.toList());

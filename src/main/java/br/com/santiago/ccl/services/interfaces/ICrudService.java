@@ -16,6 +16,8 @@ public interface ICrudService<T extends AbstractBaseEntity, K extends AbstractBa
 	public T findById(Long id);
 
 	public T insert(T entity);
+	
+	public List<T> saveAll(List<T> list); 
 
 	public T update(T entity);
 

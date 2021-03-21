@@ -1,5 +1,6 @@
 package br.com.santiago.ccl.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +17,7 @@ import br.com.santiago.ccl.builders.ThemeBuilder;
 import br.com.santiago.ccl.domain.Theme;
 import br.com.santiago.ccl.dtos.ThemeRequestDto;
 import br.com.santiago.ccl.repositories.ThemeRepository;
+import br.com.santiago.ccl.services.exceptions.ObjectNotFoundException;
 import br.com.santiago.ccl.services.exceptions.ObjectUniqueException;
 import br.com.santiago.ccl.services.interfaces.ICrudService;
 
@@ -32,6 +34,26 @@ public class ThemeServiceTest extends AbstractBaseServiceTest<Theme, ThemeReques
 		when((((ThemeRepository) this.baseRepository).alreadyExistsName(Mockito.anyString()))).thenReturn(true);
 
 		assertThrows(ObjectUniqueException.class, () -> this.baseService.insert(this.baseEntity));
+	}
+
+	@Test
+	public void mustReturnSuccess_WhenFindByName() {
+		String name = this.baseEntity.getName();
+
+		when(this.themerepository.findByName(name)).thenReturn(this.baseEntityOpt);
+
+		Theme result = this.themeService.findByName(name);
+
+		assertEquals(this.baseEntity, result);
+	}
+
+	@Test
+	public void mustReturnException_WhenFindByName() {
+		String name = this.baseEntity.getName();
+
+		when(this.themerepository.findByName(name)).thenReturn(Optional.empty());
+
+		assertThrows(ObjectNotFoundException.class, () -> this.themeService.findByName(name));
 	}
 
 	@Override
@@ -65,6 +87,11 @@ public class ThemeServiceTest extends AbstractBaseServiceTest<Theme, ThemeReques
 		themeUpdate.setName("Theme update");
 
 		return themeUpdate;
+	}
+
+	@Override
+	public ThemeRequestDto mockDtoBuilder() {
+		return ThemeBuilder.createMockthemeRequestDto();
 	}
 
 }

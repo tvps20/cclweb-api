@@ -7,6 +7,6 @@ public interface IMapperObject<T extends AbstractBaseEntity, K extends AbstractB
 
 	T parseToEntity(K request);
 
-	AbstractBaseDto parteToDto(T entity);
+	AbstractBaseDto parseToDto(T entity);
 
 }

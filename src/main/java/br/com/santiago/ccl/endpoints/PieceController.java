@@ -40,7 +40,7 @@ public class PieceController extends AbstractBaseController<Piece, PieceRequestD
 
 	@Override
 	public PieceRequestDto parseToDto(Piece response) {
-		return (PieceRequestDto) this.baseService.parteToDto(response);
+		return (PieceRequestDto) this.baseService.parseToDto(response);
 	}
 
 }

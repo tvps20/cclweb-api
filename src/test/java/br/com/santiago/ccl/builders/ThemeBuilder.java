@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 import br.com.santiago.ccl.domain.Theme;
+import br.com.santiago.ccl.dtos.ThemeRequestDto;
 
 public class ThemeBuilder {
 
 	private Theme theme;
+
+	private ThemeRequestDto themeRequestDto;
 
 	private List<Theme> themes;
 
@@ -26,6 +29,13 @@ public class ThemeBuilder {
 		ThemeBuilder builder = createBaseThemeBuilder();
 
 		return Optional.of(builder.theme);
+	}
+
+	public static ThemeRequestDto createMockthemeRequestDto() {
+		ThemeBuilder builder = new ThemeBuilder();
+		builder.themeRequestDto = ThemeRequestDto.builder().name("Parts Pack").build();
+
+		return builder.themeRequestDto;
 	}
 
 	public static List<Theme> createMockThemesList() {
@@ -49,5 +59,5 @@ public class ThemeBuilder {
 
 		return builder;
 	}
-	
+
 }

@@ -7,10 +7,13 @@ import java.util.Optional;
 import br.com.santiago.ccl.domain.Piece;
 import br.com.santiago.ccl.domain.Set;
 import br.com.santiago.ccl.domain.Theme;
+import br.com.santiago.ccl.dtos.SetRequestDto;
 
 public class SetBuilder {
 
 	private Set set;
+
+	private SetRequestDto setRequestDto;
 
 	private List<Set> sets;
 
@@ -28,6 +31,13 @@ public class SetBuilder {
 		SetBuilder builder = createBaseSetBuilder();
 
 		return Optional.of(builder.set);
+	}
+
+	public static SetRequestDto createMockSetRequestDto() {
+		SetBuilder builder = new SetBuilder();
+		builder.setRequestDto = SetRequestDto.builder().setId("2-5").name("Digger Bucket Assembly").year(1981).build();
+
+		return builder.setRequestDto;
 	}
 
 	public static List<Set> createMockSetsList() {

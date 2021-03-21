@@ -128,7 +128,7 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 
 	@Override
 	public SetRequestDto parseToDto(Set response) {
-		return (SetRequestDto) this.baseService.parteToDto(response);
+		return (SetRequestDto) this.baseService.parseToDto(response);
 	}
 
 	private SetService getSetService() {

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.santiago.ccl.domain.Theme;
 import br.com.santiago.ccl.dtos.ThemeRequestDto;
+import br.com.santiago.ccl.dtos.ThemeResponseDto;
 import br.com.santiago.ccl.endpoints.enuns.TipoEndPoint;
 import br.com.santiago.ccl.services.ThemeService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +30,8 @@ public class ThemeController extends AbstractBaseController<Theme, ThemeRequestD
 	}
 
 	@Override
-	public ThemeRequestDto parseToDto(Theme response) {
-		return (ThemeRequestDto) this.baseService.parseToDto(response);
+	public ThemeResponseDto parseToDto(Theme response) {
+		return (ThemeResponseDto) this.baseService.parseToDto(response);
 	}
 
 }

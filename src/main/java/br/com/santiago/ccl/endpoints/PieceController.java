@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.santiago.ccl.domain.Piece;
 import br.com.santiago.ccl.dtos.PieceRequestDto;
+import br.com.santiago.ccl.dtos.PieceResponseDto;
 import br.com.santiago.ccl.endpoints.enuns.TipoEndPoint;
 import br.com.santiago.ccl.endpoints.exceptions.EndpointNotExistsException;
 import br.com.santiago.ccl.services.PieceService;
@@ -24,12 +25,12 @@ public class PieceController extends AbstractBaseController<Piece, PieceRequestD
 	}
 
 	@Override
-	public ResponseEntity<Void> insert(PieceRequestDto request) throws Exception {
+	public ResponseEntity<Void> insert(PieceRequestDto request) {
 		throw new EndpointNotExistsException("Endpoint not implemented.");
 	}
 
 	@Override
-	public ResponseEntity<Void> delete(Long id) throws Exception {
+	public ResponseEntity<Void> delete(Long id) {
 		throw new EndpointNotExistsException("Endpoint not implemented.");
 	}
 
@@ -39,8 +40,8 @@ public class PieceController extends AbstractBaseController<Piece, PieceRequestD
 	}
 
 	@Override
-	public PieceRequestDto parseToDto(Piece response) {
-		return (PieceRequestDto) this.baseService.parseToDto(response);
+	public PieceResponseDto parseToDto(Piece response) {
+		return (PieceResponseDto) this.baseService.parseToDto(response);
 	}
 
 }

@@ -69,7 +69,7 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> insert(@Valid @RequestBody K request) throws Exception {
+	public ResponseEntity<Void> insert(@Valid @RequestBody K request) {
 		log.debug("[{}] [insert] [Info] - Started request for insert new data.", this.simpleClassName);
 		T entity = this.parseToEntity(request);
 		T entitySaved = this.baseService.insert(entity);
@@ -93,7 +93,7 @@ public abstract class AbstractBaseController<T extends AbstractBaseEntity, K ext
 	}
 
 	@DeleteMapping(TipoEndPoint.ID)
-	public ResponseEntity<Void> delete(@PathVariable Long id) throws Exception {
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		log.debug("[{}] [delete] [Info] - Started request for delete data.", this.simpleClassName);
 		this.baseService.deleteById(id);
 		log.debug("[{}] [delete] [Info] - Finished request for delete data.", this.simpleClassName);

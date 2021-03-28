@@ -7,12 +7,15 @@ import java.util.Optional;
 import br.com.santiago.ccl.domain.Piece;
 import br.com.santiago.ccl.domain.Set;
 import br.com.santiago.ccl.dtos.PieceRequestDto;
+import br.com.santiago.ccl.dtos.PieceResponseDto;
 
 public class PieceBuilder {
 
 	private Piece piece;
 
 	private PieceRequestDto pieceRequestDto;
+	
+	private PieceResponseDto pieceResponseDto;
 
 	private List<Piece> pieces;
 
@@ -38,6 +41,15 @@ public class PieceBuilder {
 				.description("	Brick 1 x 2").build();
 
 		return builder.pieceRequestDto;
+	}
+	
+	public static PieceResponseDto createPieceResponseDto() {
+		PieceBuilder builder = new PieceBuilder();
+		builder.pieceResponseDto = PieceResponseDto.builder().partNum("3004").color("Black")
+				.description("	Brick 1 x 2").build();
+		builder.pieceResponseDto.setId(1L);
+
+		return builder.pieceResponseDto;
 	}
 
 	public static List<Piece> createMockPiecesList() {

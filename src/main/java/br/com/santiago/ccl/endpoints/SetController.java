@@ -23,6 +23,7 @@ import br.com.santiago.ccl.domain.Set;
 import br.com.santiago.ccl.domain.Theme;
 import br.com.santiago.ccl.dtos.AbstractBaseDto;
 import br.com.santiago.ccl.dtos.PieceRequestDto;
+import br.com.santiago.ccl.dtos.SetDetailResponseDto;
 import br.com.santiago.ccl.dtos.SetRequestDto;
 import br.com.santiago.ccl.dtos.ThemeRequestDto;
 import br.com.santiago.ccl.endpoints.enuns.TipoEndPoint;
@@ -127,8 +128,8 @@ public class SetController extends AbstractBaseController<Set, SetRequestDto> {
 	}
 
 	@Override
-	public SetRequestDto parseToDto(Set response) {
-		return (SetRequestDto) this.baseService.parseToDto(response);
+	public SetDetailResponseDto parseToDto(Set response) {
+		return (SetDetailResponseDto) this.baseService.parseToDto(response);
 	}
 
 	private SetService getSetService() {

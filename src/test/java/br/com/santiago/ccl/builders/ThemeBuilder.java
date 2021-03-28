@@ -6,12 +6,15 @@ import java.util.Optional;
 
 import br.com.santiago.ccl.domain.Theme;
 import br.com.santiago.ccl.dtos.ThemeRequestDto;
+import br.com.santiago.ccl.dtos.ThemeResponseDto;
 
 public class ThemeBuilder {
 
 	private Theme theme;
 
 	private ThemeRequestDto themeRequestDto;
+
+	private ThemeResponseDto themeResponseDto;
 
 	private List<Theme> themes;
 
@@ -36,6 +39,14 @@ public class ThemeBuilder {
 		builder.themeRequestDto = ThemeRequestDto.builder().name("Parts Pack").build();
 
 		return builder.themeRequestDto;
+	}
+
+	public static ThemeResponseDto createMockthemeResponsetDto() {
+		ThemeBuilder builder = new ThemeBuilder();
+		builder.themeResponseDto = ThemeResponseDto.builder().name("Parts Pack").build();
+		builder.themeResponseDto.setId(1L);
+
+		return builder.themeResponseDto;
 	}
 
 	public static List<Theme> createMockThemesList() {
